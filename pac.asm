@@ -4,6 +4,15 @@
 .data
 msg db "DODO", 0Dh, 0Ah, '$'
 
+    pacman db 'C'
+    ghost db 'G'
+    wall db 'X'
+    hallway db '.'
+    cherry db 'o'
+    power_ball db '*'
+
+    score dw 0
+    lives db 3
 .code
 main proc
 ; print msg
