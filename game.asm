@@ -55,17 +55,66 @@ main proc
                  lea  dx, pacman
                  int  10h
 
-    ; Moving PacMan one cell to the left
-                 mov  ah, 02h
-                 mov  dl, 10*23
-                 int  10h
+    ; Game loop
+    game_loop:
+        ; Wait for key press
+        mov  ah, 01h
+        int  21h
+        mov  [key], al
 
-    ; Moving PacMan one cell up
-                 mov  ah, 02h
-                 mov  dh, 16
-                 int  10h
+        ; Handle arrow key input
+        mov  al, [key]
+        cmp  al, 0
+        je   game_loop
 
-                 mov  ah, 4ch
-                 int  21h
+        ; Clear PacMan from the current position
+        mov  cx, [pacman_row]
+        mov  dx, [pacman_col]
+        mov  ah, 02h
+        int  10h
+
+        ; Move PacMan based on arrow key input
+        cmp  al, 27  ; ESC key
+        je   end_program
+        cmp  al, 72  ; Up arrow
+        je   move_up
+        cmp  al, 80  ; Down arrow
+        je   move_down
+        cmp  al, 75  ; Left arrow
+        je   move_left
+        cmp  al, 77  ; Right arrow
+        je   move_right
+
+    move_up:
+        dec  [pacman_row]
+        jmp  update_position
+
+    move_down:
+        inc  [pacman_row]
+        jmp  update_position
+
+    move_left:
+        dec  [pacman_col]
+        jmp  update_position
+
+    move_right:
+        inc  [pacman_col]
+
+    update_position:
+        ; Display PacMan at the new position
+        mov  cx, [pacman_row]
+        mov  dx, [pacman_col]
+        mov  ah, 02h
+        lea  dx, pacman
+        int  10h
+
+        ; Continue the game loop
+        jmp  game_loop
+
+    end_program:
+        ; End program
+        mov  ah, 4Ch
+        int  21h
+    
 main endp
 end main
