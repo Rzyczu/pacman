@@ -29,6 +29,9 @@
     ;
 
     pacman db 'C', 0
+    pacman_row db 17
+    pacman_col db 11*23
+    key db 0, 0
 .code
 main proc
                  mov  ax, @data
@@ -49,8 +52,8 @@ main proc
                  loop display_loop
 
     ; Placing PacMan in the middle of the maze
-                 mov  cx, 17
-                 mov  dx, 11*23
+                 mov  cl, [pacman_col]
+                 mov  dl, [pacman_row]
                  mov  ah, 02h
                  lea  dx, pacman
                  int  10h
@@ -68,8 +71,8 @@ main proc
                 je   game_loop
 
                 ; Clear PacMan from the current position
-                mov  cx, [pacman_row]
-                mov  dx, [pacman_col]
+                mov  cl, [pacman_row]
+                mov  dl, [pacman_col]
                 mov  ah, 02h
                 int  10h
 
@@ -99,11 +102,12 @@ main proc
 
     move_right:
                 inc  [pacman_col]
+                jmp  update_position
 
     update_position:
                 ; Display PacMan at the new position
-                mov  cx, [pacman_row]
-                mov  dx, [pacman_col]
+                mov  cl, [pacman_row]
+                mov  dl, [pacman_col]
                 mov  ah, 02h
                 lea  dx, pacman
                 int  10h
