@@ -1,6 +1,6 @@
 # pacman
 
-##TODO
+## TODO
 [ ]  Wczytywanie mapy do pamięci w sposób zorganizowany.
 [ ]	Input – keyboard
 [ ]	Poruszanie gracza. Będziemy musieli usuwać kulki do zbierania, a jeżeli korytarz to będzie  “.”, trzeba będzie zamieniać kropke ze znakiem gracza.
