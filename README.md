@@ -8,7 +8,6 @@
 - [ ] Kolizja
 - [ ]	Timer – co ‘x’ ms jest wyświetlana mapa, ruch ducha i gracza.
 - [ ]	“AI” duchów - tam gdzie wolna droga, to idź.
-- [ ]	Odbijanie dwóch duchów, jeżeli wejdą na siebie.
 - [ ] Score
 - [ ] Game over
 - [ ]	Restart dopóki lives > 1
