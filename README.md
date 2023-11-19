@@ -3,7 +3,7 @@
 ## TODO
 - [x] Zainicjowanie mapy w date
 - [ ] Wczytywanie mapy do pamięci w sposób zorganizowany.
-- [ ]	Input – keyboard
+- [x]	Input – keyboard
 - [ ]	Poruszanie gracza. Będziemy musieli usuwać kulki do zbierania, a jeżeli korytarz to będzie  “.”, trzeba będzie zamieniać kropke ze znakiem gracza.
 - [ ] Kolizja
 - [ ]	Timer – co ‘x’ ms każdy duch i gracz wykonuje ruch.
