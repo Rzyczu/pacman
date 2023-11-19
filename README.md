@@ -1,6 +1,6 @@
 # pacman
 
-// Wyświetlanie mapy nie na przerwaniach, 
+// Wyświetlanie mapy nie na przerwaniach, po pamięci ekranu
 
 ## TODO
 - [x] Zainicjowanie mapy w .data
