@@ -5,20 +5,21 @@
 - [ ] Wczytywanie mapy do pamięci w sposób zorganizowany.
 - [ ]	Input – keyboard
 - [ ]	Poruszanie gracza. Będziemy musieli usuwać kulki do zbierania, a jeżeli korytarz to będzie  “.”, trzeba będzie zamieniać kropke ze znakiem gracza.
-- [ ]Kolizja
+- [ ] Kolizja
 - [ ]	Timer – co ‘x’ ms każdy duch i gracz wykonuje ruch.
 - [ ]	“AI” duchów - tam gdzie wolna droga, to idź.
 - [ ]	Odbijanie dwóch duchów, jeżeli wejdą na siebie.
-- [ ]Score
-- [ ]Game over
+- [ ] Score
+- [ ] Game over
 - [ ]	Restart dopóki lives > 1
-- [ ]Zabijanie duchów poprzez podniesienie jakiegoś gówna.
-- [ ]Win condition
+- [ ] Zabijanie duchów poprzez podniesienie jakiegoś gówna.
+- [ ] Win condition
 
 Not done
 Done
 
-##Mapa:
+## Mapa:
+
 
 - Obiekty:
 - Pacman = “C”
