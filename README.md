@@ -35,7 +35,7 @@ Done
 - Program parsuje najpierw mapę i ustawia pozycję (X i Y) potworów, ścian i gracza?
 - W jaki sposób sprawdzać, że np. Gracz idzie w lewo i na pozycji gracz + lewo jest ściana?
 
-###Moim zdaniem powyższa implementacja (X,Y) nie będzie najprostsza do zaimplementowania.
+### Moim zdaniem powyższa implementacja (X,Y) nie będzie najprostsza do zaimplementowania.
 Mój pomysł (1): 
 Wczytujemy mape do pamięci. Mamy adres początkowy, wiemy, że każdy character to jest jeden bajt, więc mamy offset każdego następnego znaku. Ustalimy offset wiersza, czyli jak jest “\n” w pliku, to wiemy, że + offset będzie kolejny wiersz.
 Wtedy wydaje mi się, że mając stack pointer, bądź inne narzędzie do śledzenia adresu, wystarczy, że będziemy sprawdzać jaki znak jest przy tym adresie + offset, zwiększając/zmniejszając pointer lokacji, by odzwierciedlać “ruch” gracza. To samo z duchami które się przemieszczają.
