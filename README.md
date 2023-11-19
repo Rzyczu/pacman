@@ -1,12 +1,12 @@
 # pacman
 
 ## TODO
-- [x] Zainicjowanie mapy w date
+- [x] Zainicjowanie mapy w .data
 - [ ] Wczytywanie mapy do pamięci w sposób zorganizowany.
 - [x]	Input – keyboard
 - [ ]	Poruszanie gracza. Będziemy musieli usuwać kulki do zbierania, a jeżeli korytarz to będzie  “.”, trzeba będzie zamieniać kropke ze znakiem gracza.
 - [ ] Kolizja
-- [ ]	Timer – co ‘x’ ms każdy duch i gracz wykonuje ruch.
+- [ ]	Timer – co ‘x’ ms jest wyświetlana mapa, ruch ducha i gracza.
 - [ ]	“AI” duchów - tam gdzie wolna droga, to idź.
 - [ ]	Odbijanie dwóch duchów, jeżeli wejdą na siebie.
 - [ ] Score
