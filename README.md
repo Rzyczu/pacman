@@ -41,3 +41,7 @@ Wczytujemy mape do pamięci. Mamy adres początkowy, wiemy, że każdy character
 Wtedy wydaje mi się, że mając stack pointer, bądź inne narzędzie do śledzenia adresu, wystarczy, że będziemy sprawdzać jaki znak jest przy tym adresie + offset, zwiększając/zmniejszając pointer lokacji, by odzwierciedlać “ruch” gracza. To samo z duchami które się przemieszczają.
 Możemy też wpisać mapę do pamięci bezpośrednio w pliku źródłowym w .data Każdy znak jest ustawiany po sobie, więc aby odróżnić następny wiersz od drugiego, po zakonczeniu wierszu dalibysmy padding jakiegos znaku specjalnego, np. Zer czy coś. Wczytalibyśmy także zmienne pomocnicze takie jak MAP_W i MAP_H, które konsekwentnie oznaczają ilość bajtów (znaków) kolumn oraz ile tych wierszów by było.
 
+## Zespół (dauna)
+- Miłosz Rzyczniak
+- Szymon Franz
+- Adam Trzpis
