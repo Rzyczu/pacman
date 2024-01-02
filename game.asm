@@ -29,8 +29,8 @@
     ;
 
     pacman db 'C', 0
-    pacman_row db 17
-    pacman_col db 11*23
+    pacman_row db 18
+    pacman_col db 11
     key db 0, 0
 .code
 main proc
@@ -42,7 +42,7 @@ main proc
                  mov  si, offset maze    ; load the address offset of maze to SOURCE INDEX reg
                  mov  cx, 24*23          ; number of elements in the maze - load this into cx, as this is an argument for display_loop
     display_loop:
-                 mov  ah, 02h            ; move cursor position interrupt service
+                 mov  ah, 02h            ; write character to standard output interrupt service
                  mov  dl, [si]           ; move the character at si address to dl
                  cmp  dl, 35             ; compare dl with character that doesn't exist, wtf
                  jne  print_char
@@ -52,17 +52,10 @@ main proc
                  inc  si
                  loop display_loop
 
-    ; -- Placing PacMan in the middle of the maze -- ;
-                 mov  cl, [pacman_col]   ; argument for the interrupt - Y
-                 mov  dl, [pacman_row]   ; argument for the interrupt - X
-                 mov  ah, 02h            ; move cursor position interrupt service
-                 lea  dx, pacman         ; load address of dx into an address of pacman
-                 int  10h                ; move cursor, because this is int 10h
-
     ; Game loop
     game_loop:
                 ; Wait for key press
-                mov  ah, 01h             ; return character from stdin WITH ECHO!
+                mov  ah, 08h             ; return character from stdin WITHOUT ECHO!
                 int  21h
                 mov  [key], al           ; character read is written on al
 
@@ -70,12 +63,6 @@ main proc
                 mov  al, [key]           ; first compare then move, redundant here
                 cmp  al, 0
                 je   game_loop           ; jump if no input
-
-                ; Clear PacMan from the current position
-                mov  cl, [pacman_row]
-                mov  dl, [pacman_col]
-                mov  ah, 02h             ; move cursor position interrupt service
-                int  10h
 
                 ; Move PacMan based on arrow key input - basically compare input to input char
                 cmp  al, 27  ; ESC key
@@ -107,10 +94,16 @@ main proc
 
     update_position:
                 ; Display PacMan at the new position
-                mov  cl, [pacman_row]      ; move Y to cl
+
+                mov  dh, [pacman_row]      ; move Y to dh
                 mov  dl, [pacman_col]      ; move X to dl
                 mov  ah, 02h               ; move cursor position interrupt service
-                lea  dx, pacman            ; load address of dx into an address of pacman
+                int  10h
+
+                mov  ah, 0Ah               ; write character only at cursor position
+                mov  al, [pacman]          ; pacman char
+                mov  bh, 0                 ; page 0
+                mov  cx, 1                 ; 1 char
                 int  10h
 
                 ; Continue the game loop
