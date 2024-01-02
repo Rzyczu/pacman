@@ -34,49 +34,50 @@
     key db 0, 0
 .code
 main proc
-                 mov  ax, @data
-                 mov  ds, ax
+    ; -- This allows for the use of variables in the code segment -- ;
+                 mov  ax, @data          ; load the first address of data to ax
+                 mov  ds, ax             ; load this address to DATA SEGMENT register
 
-    ; Displaying the maze as a table
-                 mov  si, offset maze
-                 mov  cx, 24*23          ; number of elements in the maze
+    ; -- Displaying the maze as a table -- ;
+                 mov  si, offset maze    ; load the address offset of maze to SOURCE INDEX reg
+                 mov  cx, 24*23          ; number of elements in the maze - load this into cx, as this is an argument for display_loop
     display_loop:
-                 mov  ah, 02h
-                 mov  dl, [si]
-                 cmp  dl, 35
+                 mov  ah, 02h            ; move cursor position interrupt service
+                 mov  dl, [si]           ; move the character at si address to dl
+                 cmp  dl, 35             ; compare dl with character that doesn't exist, wtf
                  jne  print_char
-                 mov  dl, '|'
+                 mov  dl, '|'            ; ?
     print_char:  
-                 int  21h
+                 int  21h                ; Write character to standard output interrupt! Not move cursor.
                  inc  si
                  loop display_loop
 
-    ; Placing PacMan in the middle of the maze
-                 mov  cl, [pacman_col]
-                 mov  dl, [pacman_row]
-                 mov  ah, 02h
-                 lea  dx, pacman
-                 int  10h
+    ; -- Placing PacMan in the middle of the maze -- ;
+                 mov  cl, [pacman_col]   ; argument for the interrupt - Y
+                 mov  dl, [pacman_row]   ; argument for the interrupt - X
+                 mov  ah, 02h            ; move cursor position interrupt service
+                 lea  dx, pacman         ; load address of dx into an address of pacman
+                 int  10h                ; move cursor, because this is int 10h
 
     ; Game loop
     game_loop:
                 ; Wait for key press
-                mov  ah, 01h
+                mov  ah, 01h             ; return character from stdin WITH ECHO!
                 int  21h
-                mov  [key], al
+                mov  [key], al           ; character read is written on al
 
                 ; Handle arrow key input
-                mov  al, [key]
+                mov  al, [key]           ; first compare then move, redundant here
                 cmp  al, 0
-                je   game_loop
+                je   game_loop           ; jump if no input
 
                 ; Clear PacMan from the current position
                 mov  cl, [pacman_row]
                 mov  dl, [pacman_col]
-                mov  ah, 02h
+                mov  ah, 02h             ; move cursor position interrupt service
                 int  10h
 
-                ; Move PacMan based on arrow key input
+                ; Move PacMan based on arrow key input - basically compare input to input char
                 cmp  al, 27  ; ESC key
                 je   end_program
                 cmp  al, 72  ; Up arrow
@@ -106,10 +107,10 @@ main proc
 
     update_position:
                 ; Display PacMan at the new position
-                mov  cl, [pacman_row]
-                mov  dl, [pacman_col]
-                mov  ah, 02h
-                lea  dx, pacman
+                mov  cl, [pacman_row]      ; move Y to cl
+                mov  dl, [pacman_col]      ; move X to dl
+                mov  ah, 02h               ; move cursor position interrupt service
+                lea  dx, pacman            ; load address of dx into an address of pacman
                 int  10h
 
                 ; Continue the game loop
@@ -117,7 +118,10 @@ main proc
 
     end_program:
                 ; End program
-                mov  ah, 4Ch
+
+                ; TODO: Clear screen
+                mov  ah, 4Ch               ; exit - terminate with return code
+                mov  al, 0
                 int  21h
     
 main endp
