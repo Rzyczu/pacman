@@ -31,6 +31,7 @@
     pacman db 'C', 0
     pacman_row db 18
     pacman_col db 11
+    background_char db 42
     key db 0, 0
 .code
 main proc
@@ -77,18 +78,50 @@ main proc
                 je   move_right
 
     move_up:
+                push cx
+                mov ah, 0Ah
+                mov al, [background_char]
+                mov bh, 0
+                mov cx, 1
+                int 10h
+                pop cx
+
                 dec  [pacman_row]
                 jmp  update_position
 
     move_down:
+                push cx
+                mov ah, 0Ah
+                mov al, [background_char]
+                mov bh, 0
+                mov cx, 1
+                int 10h
+                pop cx
+
                 inc  [pacman_row]
                 jmp  update_position
 
     move_left:
+                push cx
+                mov ah, 0Ah
+                mov al, [background_char]
+                mov bh, 0
+                mov cx, 1
+                int 10h
+                pop cx
+                
                 dec  [pacman_col]
                 jmp  update_position
 
     move_right:
+                push cx
+                mov ah, 0Ah
+                mov al, [background_char]
+                mov bh, 0
+                mov cx, 1
+                int 10h
+                pop cx
+
                 inc  [pacman_col]
                 jmp  update_position
 
@@ -107,7 +140,7 @@ main proc
                 int  10h
 
                 ; Continue the game loop
-                jmp  game_loop
+                jmp  game_loop                
 
     end_program:
                 ; End program
