@@ -1,5 +1,6 @@
 .model small
 .stack 100h
+.386
 .data
     maze   db 88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,10
            db 88,42,42,42,42,42,42,42,42,42,42,88,42,42,42,42,42,42,42,42,42,42,88,10
@@ -31,7 +32,8 @@
     pacman db 'C', 0
     pacman_row db 18
     pacman_col db 11
-    background_char db 42
+    background_char db ' '
+    wall_char db 88
     key db 0, 0
 .code
 main proc
@@ -41,7 +43,7 @@ main proc
 
     ; -- Displaying the maze as a table -- ;
                  mov  si, offset maze    ; load the address offset of maze to SOURCE INDEX reg
-                 mov  cx, 24*23          ; number of elements in the maze - load this into cx, as this is an argument for display_loop
+                 mov  cx, 25*23          ; number of elements in the maze - load this into cx, as this is an argument for display_loop
     display_loop:
                  mov  ah, 02h            ; write character to standard output interrupt service
                  mov  dl, [si]           ; move the character at si address to dl
@@ -86,6 +88,9 @@ main proc
                 int 10h
                 pop cx
 
+                mov ch, [pacman_row]
+                mov cl, [pacman_col]
+
                 dec  [pacman_row]
                 jmp  update_position
 
@@ -128,8 +133,39 @@ main proc
     update_position:
                 ; Display PacMan at the new position
 
+                ; Mov offset of maze to si
+                ; Calculate offset
+                ; Add this offset to si
+                ; See what's at si
+                ; Problem: si is a word, and we have 1 byte values
+                ; (pacman_row and pacman_col)
+                ; TODO: bit shift the pacman_row and pacman_col
+                ; so they are 16 bit (1 word values)
+                ; then, we can operate on si
+
+                ; (pacman_row * 24) + pacman_col = position
+                push ax
+                push cx
+                push bx
+                mov  si, offset maze       ; load the start address
+                mov  cx, si
+
                 mov  dh, [pacman_row]      ; move Y to dh
                 mov  dl, [pacman_col]      ; move X to dl
+
+                mov bx, [pacman_row]
+
+                0b00001111 <-
+                0b0000000000001111 <-
+
+                mov ax, 24
+                mul bx
+                add ax, dl
+
+                add cl, al ; we have character offset in al
+
+                cmp cl, [wall_char] 
+
                 mov  ah, 02h               ; move cursor position interrupt service
                 int  10h
 
