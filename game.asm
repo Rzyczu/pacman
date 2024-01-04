@@ -12,7 +12,7 @@
            db 88,88,88,88,88,42,88,88,88,88,32,88,32,88,88,88,88,42,88,88,88,88,88,10
            db 88,88,88,88,88,42,88,32,32,32,32,32,32,32,32,32,88,42,88,88,88,88,88,10
            db 88,88,88,88,88,42,88,32,88,88,88,32,88,88,88,32,88,42,88,88,88,88,88,10
-           db 32,32,32,32,32,42,88,32,88,77,77,32,77,77,88,32,88,42,32,32,32,32,32,10
+           db 32,32,32,32,32,42,88,32,88,77,77,32,77,77,88,32,88,42,42,42,42,42,42,10
            db 88,88,88,88,88,42,88,32,88,88,88,32,88,88,88,32,88,42,88,88,88,88,88,10
            db 88,88,88,88,88,42,88,32,32,32,32,32,32,32,32,32,88,42,88,88,88,88,88,10
            db 88,88,88,88,88,42,88,32,88,88,88,88,88,88,88,32,88,42,88,88,88,88,88,10
@@ -37,6 +37,8 @@
     key db 0, 0
 .code
 main proc
+    mov ah, 0
+    int 10h
     ; -- This allows for the use of variables in the code segment -- ;
                  mov  ax, @data          ; load the first address of data to ax
                  mov  ds, ax             ; load this address to DATA SEGMENT register
@@ -103,6 +105,9 @@ main proc
                 int 10h
                 pop cx
 
+                mov ch, [pacman_row]
+                mov cl, [pacman_col]
+
                 inc  [pacman_row]
                 jmp  update_position
 
@@ -114,6 +119,9 @@ main proc
                 mov cx, 1
                 int 10h
                 pop cx
+
+                mov ch, [pacman_row]
+                mov cl, [pacman_col]
                 
                 dec  [pacman_col]
                 jmp  update_position
@@ -127,6 +135,9 @@ main proc
                 int 10h
                 pop cx
 
+                mov ch, [pacman_row]
+                mov cl, [pacman_col]
+
                 inc  [pacman_col]
                 jmp  update_position
 
@@ -134,7 +145,7 @@ main proc
                 ; Display PacMan at the new position
 
                 ; Mov offset of maze to si
-                ; Calculate offset
+                ; Calculate offset (position) of pacman
                 ; Add this offset to si
                 ; See what's at si
                 ; Problem: si is a word, and we have 1 byte values
@@ -144,39 +155,46 @@ main proc
                 ; then, we can operate on si
 
                 ; (pacman_row * 24) + pacman_col = position
-                push ax
-                push cx
-                push bx
-                mov  si, offset maze       ; load the start address
-                mov  cx, si
+                push  ax                   ; push ax cx bx on stack
+                push  cx
+                push  bx
+                mov ax, 0
+                mov bx, 0
+                mov cx, 0
+
+                mov  si, offset maze       ; load the start address of the maze in source index
 
                 mov  dh, [pacman_row]      ; move Y to dh
                 mov  dl, [pacman_col]      ; move X to dl
 
-                mov bx, [pacman_row]
+                mov  al, [pacman_row]      ; move row into lower byte of ax
+                mov  bl, 24                ; move number of rows into bl
+                mul  bl                    ; 24 * pacman_row
+                add  al, [pacman_col]      ; (24 * pacman_row) + pacman_col
+                add  si, ax                ; add offset to maze offset in memory
+                mov  al, [si]              ; copy character at that offset to al
+                cmp  al, [wall_char]       ; compare char (at offset) in al with wall_char
 
-                0b00001111 <-
-                0b0000000000001111 <-
+                pop bx
+                pop cx
+                pop ax
+                je  reset_pos              ; pos is in cx, we have to reset the position
 
-                mov ax, 24
-                mul bx
-                add ax, dl
+                mov ah, 02h                ; move cursor position interrupt service
+                int 10h
 
-                add cl, al ; we have character offset in al
-
-                cmp cl, [wall_char] 
-
-                mov  ah, 02h               ; move cursor position interrupt service
-                int  10h
-
-                mov  ah, 0Ah               ; write character only at cursor position
-                mov  al, [pacman]          ; pacman char
-                mov  bh, 0                 ; page 0
-                mov  cx, 1                 ; 1 char
-                int  10h
+                mov ah, 0Ah                ; write character only at cursor position
+                mov al, [pacman]           ; pacman char
+                mov bh, 0                  ; page 0
+                mov cx, 1                  ; 1 char
+                int 10h
 
                 ; Continue the game loop
                 jmp  game_loop                
+    reset_pos:
+                mov [pacman_row], ch
+                mov [pacman_col], cl
+                jmp game_loop
 
     end_program:
                 ; End program
