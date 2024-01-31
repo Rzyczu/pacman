@@ -216,7 +216,6 @@ main proc
                             mov  cx, 1                      ; 1 char
                             int  10h
 
-    ; Check if the character at the new position is a dot (you may need to define the dot character in your data segment)
                             cmp  al, [dot_char]             ; assuming 250 is the dot character
                             je   increment_score
 
