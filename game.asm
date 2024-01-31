@@ -29,16 +29,27 @@
     ; X - 219, * - 250, C - 67, M - 38, @ - 64
     ;
 
-    pacman          db 60, 0
+    TIMER_INT       equ 1CH                                 ; 1CH is now a synonym to TIMER_INT
+    TIMER_INT_ADDR  dd (?)
+
     pacman_row      db 17
     pacman_col      db 11
+
+    pacman          db 60, 0
     background_char db 32
     wall_char       db 219
     dot_char        db 250
+
     key             db 0, 0
     store_msg       db "Score: $"
     score           dw 48
     active_key      db 0
+
+    current_dir     db 0fh
+    dir_right       db 0fh
+    dir_down        db 0eh
+    dir_left        db 0dh
+    dir_up          db 0ch
 
 .code
 main proc
@@ -56,14 +67,27 @@ main proc
                             mov  dl, [si]                   ; move the character at si address to dl
                             jne  print_char
    
-   
-   
-   
     print_char:             
                             int  21h                        ; Write character to standard output interrupt! Not move cursor.
                             inc  si
                             loop display_loop
 
+    ; Initialize timer interrupt handler
+                            mov  ah, 35h
+                            mov  al, TIMER_INT
+                            int  21h                        ; Now we have an address of this interrupt handler in bx
+                                                            ; since IVT starts at 0x00, bx, an offset, has a definitive address to 1CH handler
+                            mov  word ptr [TIMER_INT_ADDR], bx ; move address of 1Ch to TIMER_INT_ADDR | Point the 1Ch IP to the TIMER_INT_ADDR.
+                            mov  ax, es
+                            mov  word ptr TIMER_INT_ADDR[2], ax ; move code segment of the 1Ch int to the addr+2bytes (each entry in IVT is 2 words wide)
+                            mov  ax, seg handle_timer
+                            mov  ds, ax
+                            mov  dx, offset handle_timer
+                            mov  ah, 25h
+                            mov  al, TIMER_INT
+                            int  21h                        ; Ok now we set new address of the 1Ch interrupt handler. Effectively,
+                                                            ; it should be DS(handle_timer):DX(offset of handle_timer), so whenever 
+                                                            ; 1CH is called, it goes to handle_timer
 
     ; Initialize score position
                             mov  ah, 02h                    ; Set cursor position interrupt service
@@ -94,9 +118,6 @@ main proc
                             mov  bh, 0                      ; Page 0
                             mov  cx, 1                      ; 1 char
                             int  10h
-
-    
-
 
     ; Game loop
     game_loop:              
@@ -168,19 +189,13 @@ main proc
                             inc  [pacman_col]
                             jmp  update_position
 
+    handle_timer:           
+                            ; TODO: 1. Zwieksz zmienna o 1
+                            ;       2. Wroc tam gdzie sie bylo
+                            cmp 
+
     update_position:        
     ; Display PacMan at the new position
-
-    ; Mov offset of maze to si
-    ; Calculate offset (position) of pacman
-    ; Add this offset to si
-    ; See what's at si
-    ; Problem: si is a word, and we have 1 byte values
-    ; (pacman_row and pacman_col)
-    ; TODO: bit shift the pacman_row and pacman_col
-    ; so they are 16 bit (1 word values)
-    ; then, we can operate on si
-
     ; (pacman_row * 24) + pacman_col = position
                             push ax                         ; push ax cx bx on stack
                             push cx
@@ -247,8 +262,6 @@ main proc
 
     end_program:            
     ; End program
-
-    ; TODO: Clear screen
                             mov  ah, 4Ch                    ; exit - terminate with return code
                             mov  al, 0
                             int  21h
