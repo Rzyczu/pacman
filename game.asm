@@ -51,10 +51,37 @@
     dir_left        db 0dh
     dir_up          db 0ch
 
+    timer_count     db 0
+
 .code
 main proc
-                            mov  ah, 0
+
+    ; Initialize timer interrupt handler
+                            ;push ax
+                            ;push dx
+                            mov  ah, 35h
+                            mov  al, TIMER_INT
+                            int  21h                        ; Now we have an address of this interrupt handler in bx
+                                                            ; since IVT starts at 0x00, bx, an offset, has a definitive address to 1CH handler
+                            cli
+                            mov  word ptr [TIMER_INT_ADDR], bx ; move address of 1Ch to TIMER_INT_ADDR | Point the 1Ch IP to the TIMER_INT_ADDR.
+                            mov  ax, es
+                            mov  word ptr TIMER_INT_ADDR[2], ax ; move code segment of the 1Ch int to the addr+2bytes (each entry in IVT is 2 words wide)
+                            mov  ax, seg handle_timer           ; new code segment for the interrupt
+                            mov  ds, ax
+                            mov  dx, offset handle_timer
+                            mov  ah, 25h
+                            mov  al, TIMER_INT
+                            int  21h 
+                            sti                             ; Ok now we set new address of the 1Ch interrupt handler. Effectively,
+                                                            ; it should be DS(handle_timer):DX(offset of handle_timer), so whenever 
+                                                            ; 1CH is called, it goes to handle_timer
+                            xor  ax, ax
+                            mov  ax, 0
                             int  10h
+                            
+                            ;pop  dx
+                            ;pop  ax
     ; -- This allows for the use of variables in the code segment -- ;
                             mov  ax, @data                  ; load the first address of data to ax
                             mov  ds, ax                     ; load this address to DATA SEGMENT register
@@ -71,23 +98,6 @@ main proc
                             int  21h                        ; Write character to standard output interrupt! Not move cursor.
                             inc  si
                             loop display_loop
-
-    ; Initialize timer interrupt handler
-                            mov  ah, 35h
-                            mov  al, TIMER_INT
-                            int  21h                        ; Now we have an address of this interrupt handler in bx
-                                                            ; since IVT starts at 0x00, bx, an offset, has a definitive address to 1CH handler
-                            mov  word ptr [TIMER_INT_ADDR], bx ; move address of 1Ch to TIMER_INT_ADDR | Point the 1Ch IP to the TIMER_INT_ADDR.
-                            mov  ax, es
-                            mov  word ptr TIMER_INT_ADDR[2], ax ; move code segment of the 1Ch int to the addr+2bytes (each entry in IVT is 2 words wide)
-                            mov  ax, seg handle_timer
-                            mov  ds, ax
-                            mov  dx, offset handle_timer
-                            mov  ah, 25h
-                            mov  al, TIMER_INT
-                            int  21h                        ; Ok now we set new address of the 1Ch interrupt handler. Effectively,
-                                                            ; it should be DS(handle_timer):DX(offset of handle_timer), so whenever 
-                                                            ; 1CH is called, it goes to handle_timer
 
     ; Initialize score position
                             mov  ah, 02h                    ; Set cursor position interrupt service
@@ -155,6 +165,7 @@ main proc
 
     move_up:                
                             call clear_previous_position
+                            pop cx
 
                             mov  ch, [pacman_row]
                             mov  cl, [pacman_col]
@@ -192,7 +203,13 @@ main proc
     handle_timer:           
                             ; TODO: 1. Zwieksz zmienna o 1
                             ;       2. Wroc tam gdzie sie bylo
-                            cmp 
+                            ;       Albo
+                            ;       1. Zwieksz zmienna o 1
+                            ;       2. Popatrz, czy zmienna == x, bo tyle bedziemy miec*55ms interwalu (odmierzanego czasu)
+                            cli
+                            inc [timer_count]
+                            sti
+                            iret
 
     update_position:        
     ; Display PacMan at the new position
@@ -232,16 +249,6 @@ main proc
                             int  10h
 
                             cmp  al, [dot_char]             ; assuming 250 is the dot character
-                            je   increment_score
-
-
-    ; Continue the game loop
-                            jmp  game_loop
-
-
-    increment_score:        
-    ; Increment the score
-                            inc  word ptr [score]
 
     ; Continue the game loop
                             jmp  game_loop
@@ -251,11 +258,14 @@ main proc
                             mov  [pacman_col], cl
 
                             push cx
+                            push bx
                             mov  ah, 0Ah
                             mov  al, [pacman]
+                            xor  bx, bx
                             mov  bh, 0
                             mov  cx, 1
                             int  10h
+                            pop  bx
                             pop  cx
                     
                             jmp  game_loop
