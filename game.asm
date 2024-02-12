@@ -77,6 +77,8 @@ main proc
                                                             ; it should be DS(handle_timer):DX(offset of handle_timer), so whenever 
                                                             ; 1CH is called, it goes to handle_timer
                             xor  ax, ax
+                            xor  bx, bx
+                            xor  dx, dx
                             mov  ax, 0
                             int  10h
                             
@@ -135,6 +137,10 @@ main proc
                             mov  ah, 08h                    ; return character from stdin WITHOUT ECHO!
                             int  21h
                             mov  [key], al                  ; character read is written on al
+                            ;push bx
+                            ;cmp [timer_count], 7
+                            ;je  end_program
+                            ;pop bx
 
     ; Handle arrow key input
                             mov  al, [key]                  ; first compare then move, redundant here
@@ -272,6 +278,8 @@ main proc
 
     end_program:            
     ; End program
+                            mov  ax, 0
+                            int  10h
                             mov  ah, 4Ch                    ; exit - terminate with return code
                             mov  al, 0
                             int  21h
